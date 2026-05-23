@@ -69,40 +69,20 @@ if !errorlevel! neq 0 (
     pause & exit /b 1
 )
 
-:: 3. Instalar MSYS2
-echo !L_INSTALL_MSYS2!
+:: 1b. Verificar instalación previa de MSYS2/MinGW
+if exist "C:\msys64\mingw64\bin\g++.exe" (echo [INFO] Compilador C++ detectado. Saltando instalaciones de MSYS2 y GCC.) else (echo !L_INSTALL_MSYS2! 
 winget install --id MSYS2.MSYS2 -e --accept-source-agreements --accept-package-agreements >nul 2>&1
-if !errorlevel! neq 0 (
-    echo !L_MSYS2_FAIL!
-    pause & exit /b 1
-)
+if errorlevel 1 ( echo !L_MSYS2_FAIL! & pause & exit /b 1 ) )
 
 :: 4. Configurar PATH (nivel sistema)
 echo !L_SET_PATH!
-setx PATH "!PATH!;!MINGW_BIN!" /M >nul 2>&1
-
+where mingw-w64-x86_64-g++.exe >nul 2>&1 || setx PATH "!PATH!;C:\msys64\mingw64\bin" /M >nul 2>&1
 :: 5. Instalar GCC vía pacman
 echo !L_INSTALL_GCC!
-timeout /t 3 /nobreak >nul
-C:\msys64\usr\bin\bash.exe --login -c "pacman -Sy --noconfirm mingw-w64-x86_64-gcc" >nul 2>&1
-if !errorlevel! neq 0 (
-    echo !L_GCC_FAIL!
-    pause & exit /b 1
-)
+if exist "C:\msys64\mingw64\bin\g++.exe" (echo [INFO] Compilador C++ ya instalado. Saltando la instalación de GCC.) else (timeout /t 3 /nobreak >nul && C:\msys64\usr\bin\bash.exe --login -c "pacman -Sy --noconfirm mingw-w64-x86_64-gcc" >nul 2>&1
+if errorlevel 1 ( echo !L_GCC_FAIL! & pause & exit /b 1 ) )
 
-:: 6. Verificación final
-echo !L_VERIFY!
-if exist "!MINGW_BIN!\g++.exe" (
-    echo.
-    echo !L_OK!
-    echo !L_EXEC! !MINGW_BIN!\g++.exe
-    echo !L_VER!
-    "!MINGW_BIN!\g++.exe" --version | findstr /C:"g++"
-    echo.
-    echo !L_RESTART!
-) else (
-    echo !L_VERIFY_FAIL!
-)
+if exist "C:\msys64\mingw64\bin\g++.exe" (echo !L_OK! Instalador detectado. Compilador C++ ya está instalado.) else (echo !L_VERIFY! )
 
 echo.
 pause
