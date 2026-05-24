@@ -63,7 +63,7 @@ if !errorlevel! neq 0 (
 )
 
 :: 2. Verificar disponibilidad de winget
-winget --version >nul 2>&1
+winget --version
 if !errorlevel! neq 0 (
     echo !L_WINGET_MISSING!
     pause & exit /b 1
@@ -79,7 +79,7 @@ echo !L_SET_PATH!
 where mingw-w64-x86_64-g++.exe >nul 2>&1 || setx PATH "!PATH!;C:\msys64\mingw64\bin" /M >nul 2>&1
 :: 5. Instalar GCC vía pacman
 echo !L_INSTALL_GCC!
-if exist "C:\msys64\mingw64\bin\g++.exe" (echo [INFO] Compilador C++ ya instalado. Saltando la instalación de GCC.) else (timeout /t 3 /nobreak >nul && C:\msys64\usr\bin\bash.exe --login -c "pacman -Sy --noconfirm mingw-w64-x86_64-gcc" >nul 2>&1
+if exist "C:\msys64\mingw64\bin\g++.exe" (echo [INFO] Compilador C++ ya instalado. Saltando la instalación de GCC.) else (timeout /t 3 /nobreak >nul && C:\msys64\usr\bin\bash.exe --login -c "pacman -Sy --noconfirm mingw-w64-x86_64-gcc"
 if errorlevel 1 ( echo !L_GCC_FAIL! & pause & exit /b 1 ) )
 
 if exist "C:\msys64\mingw64\bin\g++.exe" (echo !L_OK! Instalador detectado. Compilador C++ ya está instalado.) else (echo !L_VERIFY! )
